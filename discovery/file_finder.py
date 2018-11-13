@@ -15,7 +15,6 @@ class FileFinder:
         for path in paths_to_read:
             files = os.listdir(path)
             for name in files:
-                print(name)
                 if name.lower().endswith(('.aac', '.mp3', '.mp4', '.wav', '.avi')):
                     play_file = str(path) + "/" + str(name)
 

@@ -1,3 +1,4 @@
 /Users/jamessheard/Desktop
 /Users/jamessheard/Documents
 /Users/jamessheard/Movies
+/Users/jamessheard/Downloads

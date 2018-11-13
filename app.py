@@ -1,14 +1,12 @@
 from state_store.data_saver import DataStorer
 from discovery.file_finder import FileFinder
 from media_player.start_media import MediaPlayer
+from state_store.create_playlist import PlayList
 import time
 from tkinter import filedialog
 from tkinter import *
 import subprocess
 import os
-
-
-
 
 
 def store_directory(directory_to_create):
@@ -33,6 +31,8 @@ def play_media(value):
         if media['name'] == value:
             print(media['easy_play_directory'])
             play.play_mp3(media['easy_play_directory'])
+    global selected_song
+    selected_song = value
 
 def pause_music():
     play = MediaPlayer()
@@ -42,21 +42,26 @@ def unpause():
     play = MediaPlayer()
     play.unpause_mp3()
 
-def play_video():
-    cap = cv2.VideoCapture("video.mp4")
-    ret, frame = cap.read()
-    while (1):
-        ret, frame = cap.read()
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q') or ret == False:
-            cap.release()
-            cv2.destroyAllWindows()
-            break
-        cv2.imshow('frame', frame)
+def create_playlist(playlist_text):
+    play = PlayList()
+    play.create_play_list(playlist_text)
+
+def get_playlists():
+    play = PlayList()
+    playlist = play.read_playlists()
+    return playlist
+
+def add_to_playlist(playlist_text):
+    print('Into add to playlist')
+    play = PlayList()
+    for media in media_options['media']:
+        print(media['name'])
+        print(selected_song)
+        if media['name'] == selected_song:
+            play.add_song_to_playlist(playlist_text, selected_song, media['easy_play_directory'])
 
 def ui_gen():
     master = Tk()
-
     file_finder = FileFinder()
 
     global media_options
@@ -67,11 +72,32 @@ def ui_gen():
     media_list = StringVar(master)
     media_list.set(pretty_media_list[0])
 
-    media_list = OptionMenu(master, media_list, *pretty_media_list, command=play_media).grid(row=2, column=1, sticky=W, pady=4)
-    Button(master, text='Select a directory to import all media from', command=open_folder).grid(row=0, column=1, sticky=W, pady=4)
-    Button(master, text='Pause', command=pause_music).grid(row=2, column=3, sticky=W, pady=4)
-    Button(master, text='Play', command=unpause).grid(row=2, column=2, sticky=W, pady=4)
-    Button(master, text='Play VIDEO', command=play_video).grid(row=4, column=2, sticky=W, pady=4)
+    Label(master, text="Import media").grid(row=0, column=0, sticky=W, pady=4)
+    Button(master, text='Select a directory to import all media from', command=open_folder).grid(row=1, column=0,
+                                                                                                 sticky=W, pady=4)
+    select_song_text = Label(master, text="Select a song to play").grid(row=3, column=0, sticky=W, pady=4)
+    media_list = OptionMenu(master, media_list, *pretty_media_list, command=play_media).grid(row=4, column=0, sticky=W, pady=4)
+    Button(master, text='Pause', command=pause_music).grid(row=4, column=1, sticky=W, pady=4)
+    Button(master, text='Play', command=unpause).grid(row=4, column=2, sticky=W, pady=4)
+
+    playlist_text = Label(master, text="Create a playlist").grid(row=6, column=0, sticky=W, pady=4)
+    Label(master, text="Please enter a playlist name").grid(row=7)
+
+    playlist_name = Entry(master)
+    playlist_name.grid(row=8, column=0)
+
+
+    Button(master, text='Create', command=lambda: create_playlist(playlist_name.get())).grid(row=8, column=1, sticky=W, pady=4)
+
+    pretty_playlist_list = get_playlists()
+
+    playlists = StringVar(master)
+    playlists.set(pretty_playlist_list[0])
+    Label(master, text="Select a playlist").grid(row=9, column=0, sticky=W, pady=4)
+    playlists = OptionMenu(master, playlists, *pretty_playlist_list, command=play_media).grid(row=10, column=0, sticky=W,
+                                                                                             pady=4)
+    Button(master, text='Add current song to selected playlist', command=lambda: add_to_playlist(playlist_name.get())).grid(row=11, column=0,
+                                                                                                       sticky=W, pady=4)
 
     mainloop()
 
