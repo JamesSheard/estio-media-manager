@@ -1,10 +1,8 @@
 import os
-import json
-import subprocess
-
 
 class FileFinder:
 
+    # Finds all files within the directory, then filters out the .mp3 files.
     def find_files_in_directory(self):
         file_paths = open("file_paths.txt", "r+")
 
@@ -15,7 +13,7 @@ class FileFinder:
         for path in paths_to_read:
             files = os.listdir(path)
             for name in files:
-                if name.lower().endswith(('.aac', '.mp3', '.mp4', '.wav', '.avi')):
+                if name.lower().endswith('.mp3'):
                     play_file = str(path) + "/" + str(name)
 
                     split_name = name.split('.')

@@ -3,6 +3,7 @@ import json
 import subprocess
 import signal
 import pygame.mixer
+from state_store.playlist_manager import PlayList
 
 
 class MediaPlayer:
@@ -29,3 +30,10 @@ class MediaPlayer:
         except:
             print('First time playing media')
 
+    def play_playlist(self, playlist_selected):
+        play = PlayList()
+        playlists = play.read_playlists()
+
+
+        for song in playlists['playlists']['playlist_selected']:
+            pygame.mixer.music.queue(song['easy_play_directory'])
